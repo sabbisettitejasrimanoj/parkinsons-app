@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Parkinson's Disease Detection</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<!-- Navigation Header -->
+<div class="navbar">
+    <img src="C:\Users\tejasri manoj\OneDrive\Desktop\parkinson_project\logo.jpeg" alt="Site Logo" class="site-logo" style="margin-right: 15px;">
+    <h1>🏥 Parkinson's Disease Detection System</h1>
+    <p class="subtitle">Advanced Medical Analysis Platform</p>
+    <div class="nav-links">
+        <a href="/info" class="nav-link">📘 About Parkinson's</a>
+    </div>
+</div>
+
+<div class="container">
+    <!-- Tab Navigation -->
+    <div class="tabs">
+        <button class="tab-button active" onclick="switchTab(event, 'image-tab')">
+            📸 Image Upload
+        </button>
+        <button class="tab-button" onclick="switchTab(event, 'manual-tab')">
+            🔢 Manual Input
+        </button>
+        <button class="tab-button" onclick="switchTab(event, 'audio-tab')">
+            🎤 Voice Input
+        </button>
+    </div>
+
+    <!-- IMAGE UPLOAD TAB -->
+    <div id="image-tab" class="tab-content active">
+        <div class="upload-section">
+            <h2>Upload Patient Test Image</h2>
+            <p class="section-subtitle">Drag and drop or click to upload medical images (JPG, PNG, JPEG)</p>
+            
+            <!-- Drag and Drop Zone -->
+            <div class="upload-box" id="uploadBox">
+                <div class="upload-icon">📁</div>
+                <h3>Drag images here or click to browse</h3>
+                <p>Supported formats: JPG, JPEG, PNG</p>
+                <p class="file-limit">Maximum file size: 5MB</p>
+                <input type="file" id="fileInput" accept=".jpg,.jpeg,.png" hidden>
+            </div>
+
+            <!-- Image Preview -->
+            <div id="previewContainer" class="preview-container" style="display: none;">
+                <h3>Preview</h3>
+                <img id="previewImage" src="" alt="Preview">
+                <div class="preview-info">
+                    <p><strong>Filename:</strong> <span id="fileName"></span></p>
+                    <button type="button" class="btn-remove" onclick="removePreview()">Remove</button>
+                </div>
+            </div>
+
+            <!-- Upload Status -->
+            <div id="uploadStatus" class="upload-status" style="display: none;">
+                <div class="spinner"></div>
+                <p id="statusText">Uploading image...</p>
+            </div>
+
+            <!-- Error Messages -->
+            <div id="errorMessage" class="error-message" style="display: none;"></div>
+
+            <!-- Submit Button -->
+            <form id="imageForm" style="display: none;">
+                <input type="hidden" id="hiddenFileName" name="image_file">
+                <button type="button" class="btn-predict" onclick="submitImagePrediction()">
+                    🔬 Analyze Image
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- AUDIO INPUT TAB -->
+    <div id="audio-tab" class="tab-content">
+        <div class="upload-section">
+            <h2>Upload or Record Voice Sample</h2>
+            <p class="section-subtitle">Provide a short audio clip (WAV, MP3, etc.)</p>
+            <input type="file" id="audioInput" accept="audio/*">
+            <div id="audioPreview" style="display:none; margin-top:20px;">
+                <h3>Preview</h3>
+                <audio id="previewAudio" controls></audio>
+                <div class="preview-info">
+                    <p><strong>Filename:</strong> <span id="audioFileName"></span></p>
+                    <button type="button" class="btn-remove" onclick="removeAudioPreview()">Remove</button>
+                </div>
+            </div>
+            <div id="audioError" class="error-message" style="display:none;"></div>
+            <form id="audioForm" style="display:none;">
+                <input type="hidden" id="hiddenAudioName" name="audio_file">
+                <button type="button" class="btn-predict" onclick="submitAudioPrediction()">
+                    🔬 Analyze Voice
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MANUAL INPUT TAB -->
+    <div id="manual-tab" class="tab-content">
+        <div class="form-section">
+            <h2>Manual Feature Input</h2>
+            <p class="section-subtitle">Enter vocal features for analysis</p>
+            
+            <form action="/predict" method="post" class="manual-form">
+
+            <form action="/predict" method="post" class="manual-form">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="mdvp_fo">MDVP:Fo(Hz)</label>
+                        <input type="number" step="any" name="MDVP:Fo(Hz)" placeholder="Enter value" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="mdvp_fhi">MDVP:Fhi(Hz)</label>
+                        <input type="number" step="any" name="MDVP:Fhi(Hz)" placeholder="Enter value" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="mdvp_flo">MDVP:Flo(Hz)</label>
+                        <input type="number" step="any" name="MDVP:Flo(Hz)" placeholder="Enter value" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="mdvp_jitter_pct">MDVP:Jitter(%)</label>
+                        <input type="number" step="any" name="MDVP:Jitter(%)" placeholder="Enter value" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="mdvp_jitter_abs">MDVP:Jitter(Abs)</label>
+                        <input type="number" step="any" name="MDVP:Jitter(Abs)" placeholder="Enter value" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="mdvp_rap">MDVP:RAP</label>
+                        <input type="number" step="any" name="MDVP:RAP" placeholder="Enter value" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="mdvp_ppq">MDVP:PPQ</label>
+                        <input type="number" step="any" name="MDVP:PPQ" placeholder="Enter value" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="jitter_ddp">Jitter:DDP</label>
+                        <input type="number" step="any" name="Jitter:DDP" placeholder="Enter value" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="mdvp_shimmer">MDVP:Shimmer</label>
+                        <input type="number" step="any" name="MDVP:Shimmer" placeholder="Enter value" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="mdvp_shimmer_db">MDVP:Shimmer(dB)</label>
+                        <input type="number" step="any" name="MDVP:Shimmer(dB)" placeholder="Enter value" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="shimmer_apq3">Shimmer:APQ3</label>
+                        <input type="number" step="any" name="Shimmer:APQ3" placeholder="Enter value" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="shimmer_apq5">Shimmer:APQ5</label>
+                        <input type="number" step="any" name="Shimmer:APQ5" placeholder="Enter value" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="mdvp_apq">MDVP:APQ</label>
+                        <input type="number" step="any" name="MDVP:APQ" placeholder="Enter value" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="shimmer_dda">Shimmer:DDA</label>
+                        <input type="number" step="any" name="Shimmer:DDA" placeholder="Enter value" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="nhr">NHR</label>
+                        <input type="number" step="any" name="NHR" placeholder="Enter value" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="hnr">HNR</label>
+                        <input type="number" step="any" name="HNR" placeholder="Enter value" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="rpde">RPDE</label>
+                        <input type="number" step="any" name="RPDE" placeholder="Enter value" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="dfa">DFA</label>
+                        <input type="number" step="any" name="DFA" placeholder="Enter value" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="spread1">spread1</label>
+                        <input type="number" step="any" name="spread1" placeholder="Enter value" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="spread2">spread2</label>
+                        <input type="number" step="any" name="spread2" placeholder="Enter value" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="d2">D2</label>
+                        <input type="number" step="any" name="D2" placeholder="Enter value" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="ppe">PPE</label>
+                        <input type="number" step="any" name="PPE" placeholder="Enter value" required>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-predict">
+                    🔬 Predict Status
+                </button>
+            </form>
+        </div>
+    </div>
+
+</div>
+
+<!-- Footer -->
+<div class="footer">
+    <p>© 2026 Parkinson's Disease Detection System | Medical AI Platform | Final Year Project</p>
+</div>
+
+<script src="/static/script.js"></script>
+
+</body>
+</html>
